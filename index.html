@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AAHIR ENTERPRISE</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f3f5f8;margin:0;padding:15px;color:#222}
+h2{text-align:center;color:#123d65}
+.card{background:white;padding:15px;margin:12px 0;border-radius:12px;box-shadow:0 2px 8px #ddd}
+input,select,button{box-sizing:border-box;width:100%;padding:12px;margin:5px 0;border:1px solid #bbb;border-radius:7px;font-size:16px}
+button{background:#123d65;color:white;border:0;font-weight:bold}
+.item{border:1px solid #ddd;padding:10px;border-radius:8px;margin:10px 0}
+.green{background:#168348}
+.red{background:#b52b2b}
+.total{font-size:20px;font-weight:bold}
+small{color:#555}
+</style>
+</head>
+<body>
+<h2>AAHIR ENTERPRISE</h2>
+<div class="card">
+<h3>ગ્રાહકની માહિતી</h3>
+<input id="customer" placeholder="ગ્રાહકનું નામ">
+<input id="phone" placeholder="મોબાઇલ નંબર" inputmode="numeric">
+</div>
+
+<div class="card">
+<h3>વસ્તુઓનું બિલ</h3>
+<div id="items"></div>
+<button onclick="addItem()">+ બીજી વસ્તુ ઉમેરો</button>
+</div>
+
+<div class="card">
+<h3>ચુકવણી</h3>
+<label>મળેલી રકમ</label>
+<input id="paid" type="number" value="0" oninput="calculate()">
+<div class="total">કુલ: ₹<span id="grand">0.00</span></div>
+<div>બાકી: ₹<span id="due">0.00</span></div>
+<button class="green" onclick="saveBill()">બિલ સેવ કરો</button>
+<button onclick="shareBill()">WhatsApp પર મોકલો</button>
+</div>
+
+<div class="card">
+<h3>બિલનો ઇતિહાસ</h3>
+<button onclick="exportData()">ડેટાનો બેકઅપ ડાઉનલોડ કરો</button>
+<div id="history"></div>
+</div>
+
+<script>
+let bills=JSON.parse(localStorage.getItem("aahirBills")||"[]");
+let count=0;
+
+function addItem(){
+ const id=++count;
+ const d=document.createElement("div");
+ d.className="item";
+ d.innerHTML=`
+ <input class="nm" placeholder="વસ્તુનું નામ">
+ <input class="qty" type="number" min="0" value="1" placeholder="જથ્થો" oninput="calculate()">
+ <input class="rate" type="number" min="0" value="0" placeholder="ભાવ" oninput="calculate()">
+ <input class="disc" type="number" min="0" max="100" value="0" placeholder="ડિસ્કાઉન્ટ %" oninput="calculate()">
+ <select class="gst" onchange="calculate()">
+ <option value="0">GST 0%</option><option value="5">GST 5%</option>
+ <option value="12">GST 12%</option><option value="18" selected>GST 18%</option>
+ <option value="28">GST 28%</option></select>
+ <select class="mode" onchange="calculate()">
+ <option value="inclusive">ભાવમાં GST સામેલ છે</option>
+ <option value="exclusive">ભાવમાં GST સામેલ નથી</option>
+ </select>
+ <small>આ વસ્તુની રકમ: ₹<span class="line">0.00</span></small>
+ <button class="red" onclick="this.parentElement.remove();calculate()">વસ્તુ કાઢી નાખો</button>`;
+ document.getElementById("items").appendChild(d);
+ calculate();
+}
+
+function calculate(){
+ let total=0;
+ document.querySelectorAll(".item").forEach(el=>{
+ let q=+(el.querySelector(".qty").value)||0;
+ let r=+(el.querySelector(".rate").value)||0;
+ let dis=+(el.querySelector(".disc").value)||0;
+ let gst=+(el.querySelector(".gst").value)||0;
+ let base=q*r*(1-dis/100);
+ let amount=el.querySelector(".mode").value==="inclusive"?base:base*(1+gst/100);
+ el.querySelector(".line").textContent=amount.toFixed(2);
+ total+=amount;
+ });
+ document.getElementById("grand").textContent=total.toFixed(2);
+ document.getElementById("due").textContent=Math.max(0,total-(+document.getElementById("paid").value||0)).toFixed(2);
+ return total;
+}
+
+function saveBill(){
+ let name=document.getElementById("customer").value.trim();
+ if(!name){alert("ગ્રાહકનું નામ લખો");return;}
+ let rows=[];
+ document.querySelectorAll(".item").forEach(el=>{
+ rows.push({name:el.querySelector(".nm").value,qty:el.querySelector(".qty").value,rate:el.querySelector(".rate").value,discount:el.querySelector(".disc").value,gst:el.querySelector(".gst").value,mode:el.querySelector(".mode").value,amount:el.querySelector(".line").textContent});
+ });
+ if(!rows.length){alert("ઓછામાં ઓછી એક વસ્તુ ઉમેરો");return;}
+ let total=calculate(),paid=+document.getElementById("paid").value||0;
+ bills.unshift({date:new Date().toLocaleString("en-IN"),customer:name,phone:document.getElementById("phone").value,items:rows,total,paid,due:Math.max(0,total-paid)});
+ localStorage.setItem("aahirBills",JSON.stringify(bills));
+ showHistory();
+ alert("બિલ સેવ થઈ ગયું");
+}
+
+function showHistory(){
+ document.getElementById("history").innerHTML=bills.map((b,i)=>
+ `<div class="item"><b>${b.customer}</b><br>${b.date}<br>કુલ: ₹${b.total.toFixed(2)}<br>બાકી: ₹${b.due.toFixed(2)}</div>`
+ ).join("");
+}
+function shareBill(){
+ let name=document.getElementById("customer").value||"ગ્રાહક";
+ let msg="AAHIR ENTERPRISE%0Aગ્રાહક: "+name+"%0Aકુલ બિલ: ₹"+calculate().toFixed(2);
+ window.open("https://wa.me/?text="+msg,"_blank");
+}
+function exportData(){
+ let blob=new Blob([JSON.stringify(bills,null,2)],{type:"application/json"});
+ let a=document.createElement("a");
+ a.href=URL.createObjectURL(blob);a.download="aahir-backup.json";a.click();
+ URL.revokeObjectURL(a.href);
+}
+addItem();showHistory();
+</script>
+</body>
+</html>
