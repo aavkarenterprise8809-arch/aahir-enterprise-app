@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="gu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AAHIR ENTERPRISE - GST Billing</title>
+<style>
+:root{--blue:#173d70;--line:#333}
+*{box-sizing:border-box}
+body{font-family:Arial,sans-serif;margin:0;background:#f2f4f7;color:#171717}
+header{background:var(--blue);color:#fff;padding:14px 16px}
+header h1{font-size:21px;margin:0} header p{margin:4px 0 0;font-size:13px}
+main{max-width:980px;margin:16px auto;padding:0 12px}
+.panel{background:#fff;border:1px solid #d6dbe2;border-radius:10px;padding:14px;margin-bottom:14px}
+h2{font-size:17px;margin:0 0 12px;color:var(--blue)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+label{display:block;font-size:13px;font-weight:700;margin-bottom:4px}
+input,textarea,select{width:100%;padding:10px;border:1px solid #aeb7c2;border-radius:6px;font-size:15px;background:white}
+textarea{min-height:70px;resize:vertical}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button{border:0;border-radius:7px;padding:11px 14px;font-size:14px;font-weight:700;background:var(--blue);color:white}
+button.secondary{background:#586575}button.danger{background:#a72c2c}
+.item{border:1px solid #ccd3dc;border-radius:8px;padding:10px;margin:10px 0}
+.itemgrid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr .8fr;gap:7px}
+.itemgrid label{font-size:11px}
+.summary{margin-left:auto;max-width:360px}
+.sumrow{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #e3e6ea}
+.total{font-size:20px;font-weight:800;color:var(--blue)}
+.note{font-size:12px;color:#586575;line-height:1.5}
+#historyList button{margin:4px}
+@media(max-width:650px){.grid{grid-template-columns:1fr}.itemgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.summary{max-width:none}}
+@media print{
+ body{background:white}header,.no-print,.panel.formpanel,#historyPanel{display:none!important}
+ main{max-width:none;margin:0;padding:0}.invoice{border:0!important;border-radius:0!important;padding:0!important}
+ @page{size:A4;margin:10mm}
+}
+.invoice{background:white;border:1px solid #333;padding:12px;font-size:12px}
+.invtitle{text-align:center;font-size:17px;font-weight:bold;margin-bottom:8px}
+.invtop{display:grid;grid-template-columns:1.1fr 1fr;border:1px solid var(--line)}
+.company{padding:7px;border-right:1px solid var(--line);white-space:pre-line;line-height:1.35}
+.meta{display:grid;grid-template-columns:1fr 1fr}
+.meta div{padding:6px;border-bottom:1px solid #777;border-right:1px solid #777;min-height:39px}
+.buyer{border:1px solid var(--line);border-top:0;padding:7px;min-height:92px;white-space:pre-line;line-height:1.35}
+table{width:100%;border-collapse:collapse;margin-top:0}
+th,td{border:1px solid #555;padding:5px 4px;vertical-align:top}
+th{text-align:center;font-weight:700}
+td.num{text-align:right;white-space:nowrap}
+.taxbox{display:flex;justify-content:flex-end;margin-top:0}
+.taxbox table{width:55%;margin:0}
+.totalrow{font-weight:bold;font-size:14px}
+.words{border:1px solid #555;padding:7px;min-height:42px}
+.foot{display:grid;grid-template-columns:1fr 1fr;border:1px solid #555;border-top:0;min-height:80px}
+.foot div{padding:7px}
+.sign{text-align:right;display:flex;flex-direction:column;justify-content:space-between}
+</style>
+</head>
+<body>
+<header><h1>AAHIR ENTERPRISE</h1><p>GST Billing App · ગુજરાતી / English</p></header>
+<main>
+<section class="panel formpanel">
+<h2>કંપનીની વિગતો (કાયમી)</h2>
+<div class="note">આ વિગતો તમારા મોકલેલા GST બિલમાંથી લેવામાં આવી છે.</div>
+<div class="grid">
+<div><label>Company Name</label><input id="coName" value="AAHIR ENTERPRISE (26-27)"></div>
+<div><label>GST Number</label><input id="coGst" value="24AHSPA1106A1Z8"></div>
+<div><label>Address</label><textarea id="coAddress">G-3, AKSHAT AVENUE,
+OPP. REVATI TOWER,
+NR. LE MERIDIAN HOTEL,
+RAMDEVNAGAR, SATELLITE,
+AHMEDABAD-380015</textarea></div>
+<div><label>Email</label><input id="coEmail" value="aahirenterprise@gmail.com"></div>
+</div>
+</section>
+<section class="panel formpanel">
+<h2>નવું GST બિલ</h2>
+<div class="grid">
+<div><label>Invoice No.</label><input id="invoiceNo" value="775"></div>
+<div><label>Date</label><input id="invoiceDate" type="date"></div>
+<div><label>Challan No.</label><input id="challan" placeholder="જેમ કે G-463"></div>
+<div><label>Mode / Terms of Payment</label><input id="paymentTerms" placeholder="જેમ કે Credit / Cash"></div>
+<div><label>Buyer Name</label><input id="buyerName" placeholder="ગ્રાહકનું નામ"></div>
+<div><label>Buyer GST No.</label><input id="buyerGst" placeholder="ગ્રાહકનો GST નંબર"></div>
+<div><label>Buyer Address</label><textarea id="buyerAddress" placeholder="ગ્રાહકનું સરનામું"></textarea></div>
+<div><label>Terms of Delivery</label><textarea id="deliveryTerms"></textarea></div>
+</div>
+</section>
+<section class="panel formpanel">
+<div class="row" style="justify-content:space-between"><h2 style="margin:0">માલની વિગતો</h2><button type="button" onclick="addItem()">+ વસ્તુ ઉમેરો</button></div>
+<div id="items"></div>
+<div class="grid">
+<div><label>CGST %</label><input id="cgstRate" type="number" value="9" step="0.01" oninput="calculate()"></div>
+<div><label>SGST %</label><input id="sgstRate" type="number" value="9" step="0.01" oninput="calculate()"></div>
+<div><label>Round Off (રૂપિયા)</label><input id="roundOff" type="number" value="0" step="0.01" oninput="calculate()"></div>
+<div><label>Amount Received</label><input id="received" type="number" value="0" step="0.01" oninput="calculate()"></div>
+</div>
+<div class="summary">
+<div class="sumrow"><span>Taxable Amount</span><b id="taxable">₹0.00</b></div>
+<div class="sumrow"><span>Output CGST</span><b id="cgst">₹0.00</b></div>
+<div class="sumrow"><span>Output SGST</span><b id="sgst">₹0.00</b></div>
+<div class="sumrow"><span>Round Off</span><b id="roundDisplay">₹0.00</b></div>
+<div class="sumrow total"><span>Total</span><span id="grand">₹0.00</span></div>
+<div class="sumrow"><span>Balance Due</span><b id="due">₹0.00</b></div>
+</div>
+<p class="note">દરનો ભાવ GST વગરનો (exclusive) ગણાશે. Discount પછી Taxable Amount પર CGST અને SGST ઉમેરાશે. આ નમૂનામાં 9% + 9% રાખ્યું છે; લાગુ GST દર પ્રમાણે બદલો.</p>
+<div class="row">
+<button onclick="saveBill()">બિલ સેવ કરો</button>
+<button class="secondary" onclick="prepareInvoice()">બિલ જુઓ / PDF / Print</button>
+<button class="secondary" onclick="exportData()">Backup JSON</button>
+<label class="secondary" style="padding:10px;border-radius:7px;color:white;background:#586575">Backup Import <input type="file" accept="application/json" onchange="importData(event)" style="display:none"></label>
+</div>
+</section>
+<section class="panel invoice" id="invoicePreview">
+<div class="invtitle">TAX INVOICE</div>
+<div class="invtop">
+<div class="company"><b id="pCoName">AAHIR ENTERPRISE (26-27)</b>
+<span id="pCoAddress"></span>
+GST NO : <span id="pCoGst"></span>
+E-mail : <span id="pCoEmail"></span></div>
+<div class="meta">
+<div><b>Invoice No.</b><br><span id="pInvNo"></span></div><div><b>Dated</b><br><span id="pDate"></span></div>
+<div><b>Delivery Note</b><br></div><div><b>Mode/Terms of Payment</b><br><span id="pPayment"></span></div>
+<div><b>Supplier's Ref.</b></div><div><b>Other Reference(s)</b></div>
+<div><b>Buyer's Order No.</b></div><div><b>Dated</b></div>
+<div><b>Despatch Document No.</b><br><b>CHALLAN NO : <span id="pChallan"></span></b></div><div><b>Dated / Destination</b></div>
+<div style="grid-column:1/3;min-height:48px"><b>Terms of Delivery</b><br><span id="pDelivery"></span></div>
+</div></div>
+<div class="buyer"><b>Buyer</b><br><b id="pBuyer"></b>
+<span id="pBuyerAddress"></span>
+GST NO : <span id="pBuyerGst"></span></div>
+<table><thead><tr><th>Sl<br>No.</th><th>Description of Goods</th><th>Quantity</th><th>Rate</th><th>per</th><th>Disc. %</th><th>Amount</th></tr></thead><tbody id="pRows"></tbody></table>
+<div class="taxbox"><table><tbody>
+<tr><td colspan="2" style="text-align:right"><b>OUTPUT CGST @ <span id="pCgstRate"></span>%</b></td><td class="num" id="pCgst"></td></tr>
+<tr><td colspan="2" style="text-align:right"><b>OUTPUT SGST @ <span id="pSgstRate"></span>%</b></td><td class="num" id="pSgst"></td></tr>
+<tr><td colspan="2" style="text-align:right"><b>ROUND OFF</b></td><td class="num" id="pRound"></td></tr>
+<tr class="totalrow"><td colspan="2" style="text-align:right">Total</td><td class="num" id="pGrand"></td></tr>
+</tbody></table></div>
+<div class="words"><b>Amount Chargeable (in words)</b><br><b id="pWords"></b></div>
+<div class="foot"><div><b>Company's VAT TIN : &nbsp; 24AHSPA1106A1Z8</b><br><b>Buyer's VAT TIN/Sales Tax No. : </b><span id="pBuyerGst2"></span><br><br><b>Declaration</b><br>We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.</div><div class="sign"><b>for AAHIR ENTERPRISE (26-27)</b><br><br><br>Authorised Signatory</div></div>
+<div style="text-align:center;padding:8px">This is a Computer Generated Invoice</div>
+</section>
+<section class="panel" id="historyPanel"><h2>સેવ કરેલા બિલ</h2><div id="historyList" class="note">હજુ કોઈ બિલ સેવ નથી.</div></section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+let savedBills=JSON.parse(localStorage.getItem('aahirBills')||'[]');
+function money(n){return '₹'+(Number(n)||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function addItem(d={}){const div=document.createElement('div');div.className='item';div.innerHTML=`
+<div class="itemgrid">
+<div><label>Description of Goods</label><input class="desc" placeholder="વસ્તુનું નામ" value="${esc(d.desc||'')}"></div>
+<div><label>Quantity</label><input class="qty" type="number" min="0" step="0.001" value="${d.qty??1}"></div>
+<div><label>Rate (GST વગર)</label><input class="rate" type="number" min="0" step="0.01" value="${d.rate??0}"></div>
+<div><label>Per / Unit</label><input class="unit" placeholder="NOS" value="${esc(d.unit||'NOS')}"></div>
+<div><label>Discount %</label><input class="disc" type="number" min="0" max="100" step="0.01" value="${d.disc??0}"></div>
+<div><label>Amount</label><input class="amount" readonly value="0.00"></div>
+</div><div class="row" style="justify-content:flex-end;margin-top:7px"><button class="danger" type="button" onclick="this.closest('.item').remove();calculate()">વસ્તુ કાઢો</button></div>`;
+$('items').appendChild(div);div.querySelectorAll('input').forEach(x=>x.addEventListener('input',calculate));calculate()}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function getTotals(){let taxable=0,rows=[];document.querySelectorAll('.item').forEach(el=>{let desc=el.querySelector('.desc').value,qty=+el.querySelector('.qty').value||0,rate=+el.querySelector('.rate').value||0,disc=+el.querySelector('.disc').value||0,unit=el.querySelector('.unit').value;let amount=qty*rate*(1-disc/100);el.querySelector('.amount').value=amount.toFixed(2);taxable+=amount;rows.push({desc,qty,rate,unit,disc,amount})});let cr=+ $('cgstRate').value||0,sr=+$('sgstRate').value||0,cgst=taxable*cr/100,sgst=taxable*sr/100,round=+$('roundOff').value||0,total=taxable+cgst+sgst+round,received=+$('received').value||0;return {taxable,cgst,sgst,round,total,received,due:total-received,rows,cr,sr}}
+function calculate(){let t=getTotals();$('taxable').textContent=money(t.taxable);$('cgst').textContent=money(t.cgst);$('sgst').textContent=money(t.sgst);$('roundDisplay').textContent=money(t.round);$('grand').textContent=money(t.total);$('due').textContent=money(t.due)}
+function val(id){return $(id).value}
+function prepareInvoice(){let t=getTotals();$('pCoName').textContent=val('coName');$('pCoAddress').textContent='\n'+val('coAddress')+'\n';$('pCoGst').textContent=val('coGst');$('pCoEmail').textContent=val('coEmail');$('pInvNo').textContent=val('invoiceNo');$('pDate').textContent=val('invoiceDate');$('pPayment').textContent=val('paymentTerms');$('pChallan').textContent=val('challan');$('pDelivery').textContent=val('deliveryTerms');$('pBuyer').textContent=val('buyerName');$('pBuyerAddress').textContent='\n'+val('buyerAddress')+'\n';$('pBuyerGst').textContent=val('buyerGst');$('pBuyerGst2').textContent=val('buyerGst');$('pCgstRate').textContent=t.cr;$('pSgstRate').textContent=t.sr;$('pCgst').textContent=money(t.cgst);$('pSgst').textContent=money(t.sgst);$('pRound').textContent=money(t.round);$('pGrand').textContent=money(t.total);$('pWords').textContent=numberWords(Math.round(t.total))+' Only';$('pRows').innerHTML='';t.rows.forEach((r,i)=>{let tr=document.createElement('tr');tr.innerHTML=`<td>${i+1}</td><td>${esc(r.desc)}</td><td class="num">${r.qty} ${esc(r.unit)}</td><td class="num">${money(r.rate)}</td><td>${esc(r.unit)}</td><td class="num">${r.disc||''}</td><td class="num"><b>${money(r.amount)}</b></td>`;$('pRows').appendChild(tr)});window.print()}
+function numberWords(n){if(!n)return 'Zero Rupees';let a=['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'],b=['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];function under(x){if(x<20)return a[x];if(x<100)return b[Math.floor(x/10)]+(x%10?' '+a[x%10]:'');return a[Math.floor(x/100)]+' Hundred'+(x%100?' '+under(x%100):'')}let out=[];let crore=Math.floor(n/10000000);n%=10000000;let lakh=Math.floor(n/100000);n%=100000;let thou=Math.floor(n/1000);n%=1000;if(crore)out.push(under(crore)+' Crore');if(lakh)out.push(under(lakh)+' Lakh');if(thou)out.push(under(thou)+' Thousand');if(n)out.push(under(n));return 'Rupees '+out.join(' ')}
+function collect(){let t=getTotals();return {invoiceNo:val('invoiceNo'),date:val('invoiceDate'),challan:val('challan'),buyer:val('buyerName'),buyerGst:val('buyerGst'),buyerAddress:val('buyerAddress'),totals:t}}
+function saveBill(){let bill=collect();if(!bill.buyer.trim()){alert('કૃપા કરીને ગ્રાહકનું નામ લખો.');return}savedBills.unshift(bill);localStorage.setItem('aahirBills',JSON.stringify(savedBills));renderHistory();alert('બિલ આ મોબાઇલના બ્રાઉઝરમાં સેવ થયું છે. JSON Backup પણ સમયાંતરે ડાઉનલોડ કરો.');}
+function renderHistory(){$('historyList').innerHTML='';if(!savedBills.length){$('historyList').textContent='હજુ કોઈ બિલ સેવ નથી.';return}savedBills.forEach((b,i)=>{let d=document.createElement('div');d.style.padding='7px 0';d.innerHTML=`<b>${esc(b.invoiceNo)} · ${esc(b.buyer)}</b> — ${money(b.totals.total)} <button class="secondary" onclick="loadBill(${i})">જુઓ</button>`;$('historyList').appendChild(d)})}
+function loadBill(i){let b=savedBills[i];$('invoiceNo').value=b.invoiceNo;$('invoiceDate').value=b.date;$('challan').value=b.challan;$('buyerName').value=b.buyer;$('buyerGst').value=b.buyerGst;$('buyerAddress').value=b.buyerAddress;$('items').innerHTML='';b.totals.rows.forEach(addItem);$('cgstRate').value=b.totals.cr;$('sgstRate').value=b.totals.sr;$('roundOff').value=b.totals.round;$('received').value=b.totals.received;calculate();window.scrollTo({top:0,behavior:'smooth'})}
+function exportData(){let blob=new Blob([JSON.stringify(savedBills,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='aahir-enterprise-backup.json';a.click();URL.revokeObjectURL(a.href)}
+function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!Array.isArray(x))throw Error();savedBills=x;localStorage.setItem('aahirBills',JSON.stringify(savedBills));renderHistory();alert('Backup import થયું.')}catch(_){alert('આ Backup ફાઇલ યોગ્ય નથી.')}};r.readAsText(f)}
+$('invoiceDate').value=new Date().toISOString().slice(0,10);addItem();renderHistory();
+</script>
+</body>
+</html>
